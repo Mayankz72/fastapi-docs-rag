@@ -1,0 +1,43 @@
+name: Eval regression gate
+
+# Scores a small fixed 5-question subset of the golden dataset (see
+# tests/fixtures/) against production's Qdrant Cloud index and Gemini free
+# tier, and fails if scores drop meaningfully from the checked-in baseline.
+# Deliberately not a full 437-example run - the free-tier Gemini quota this
+# whole project is bottlenecked on can't support that on every push. Scoped
+# to only the paths that could actually change retrieval or generation
+# behavior, so unrelated commits (docs, CI config) don't spend quota for
+# nothing.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/rag/**"
+      - "src/eval/run_deepeval.py"
+      - "src/eval/check_regression.py"
+      - "src/index/**"
+      - "requirements.txt"
+  workflow_dispatch: {}
+
+jobs:
+  eval-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run regression check
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          QDRANT_COLLECTION: fastapi_corpus_contextual
+          EMBED_BACKEND: gemini
+        run: python -m src.eval.check_regression --api-key-env GEMINI_API_KEY
