@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+data/raw/
+data/processed/
+qdrant_storage/
+.pytest_cache/
+*.egg-info/
+.deepeval/
+*.log

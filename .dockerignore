@@ -1,0 +1,15 @@
+.env
+.git/
+__pycache__/
+*.pyc
+.venv/
+venv/
+data/
+qdrant_storage/
+phoenix_storage/
+.pytest_cache/
+*.egg-info/
+.deepeval/
+*.log
+tests/
+.claude/
