@@ -1,0 +1,27 @@
+[
+  {
+    "question": "Set cookies when returning a RedirectResponse",
+    "expected_answer": "@coltonbh \r\n\r\n```python\r\n@app.get(\"/cookieset2\", response_class=RedirectResponse)\r\ndef cookie_set2() -> RedirectResponse:\r\n    response = RedirectResponse(url=\"/\")\r\n    response.set_cookie(key=\"works\", value=\"here is your data\", domain=\"127.0.0.1\")\r\n    return response\r\n```",
+    "url": "https://github.com/fastapi/fastapi/discussions/7077"
+  },
+  {
+    "question": "How to handle long-running background tasks: FastAPI BackgroundTasks vs Celery?",
+    "expected_answer": "For a 2-minute video processing job, I wouldn’t use `BackgroundTasks` in production.\r\n\r\n`BackgroundTasks` runs inside the FastAPI process. That’s fine for small, non-critical work, but if the process restarts, crashes, or gets killed, the task is gone. It also isn’t a good place for CPU-heavy work.\r\n\r\nFor something like video processing or batch PDF generation, I’d put the job in a real worker queue:\r\n\r\n* **ARQ + Redis** if you want something lightweight and async-friendly.\r\n* **Celery + Redis/RabbitMQ** if you need a more mature ecosystem with things like retries, scheduling, and more complex workflows.\r\n\r\nSo I’d think about it less in terms of “how many seconds is too long?” and more in terms of **durability and resource usage**.\r\n\r\nIf losing the job is acceptable → `BackgroundTasks`.\r\n\r\nIf the job needs retries, survives deployments/restarts, or is resource-intensive → use a task queue.",
+    "url": "https://github.com/fastapi/fastapi/discussions/16297"
+  },
+  {
+    "question": "separate_input_output_schemas=False with computed fields is generating wrong response model in openapi doc for list services",
+    "expected_answer": "Can be fixed by https://github.com/fastapi/fastapi/pull/14490, but we should probably add more tests",
+    "url": "https://github.com/fastapi/fastapi/discussions/14489"
+  },
+  {
+    "question": "\"Settings example\" in docs with huge performance hit",
+    "expected_answer": "To avoid overheads caused by using `sync` dependency, you can either use `async` alternative of `lru_cache` (`alru_cache` (https://github.com/aio-libs/async-lru)) or wrap your cached function with `async` function:\r\n\r\n```python\r\n@lru_cache\r\ndef get_settings_sync():\r\n    return Settings()\r\n\r\n\r\nasync def get_settings():\r\n    return get_settings_sync()\r\n\r\n\r\n@app.get(\"/info\")\r\nasync def info(settings: Annotated[Settings, Depends(get_settings)]):\r\n    return {\r\n        \"app_name\": settings.app_name,\r\n        \"admin_email\": settings.admin_email,\r\n        \"items_per_user\": settings.items_per_user,\r\n    }\r\n\r\n```",
+    "url": "https://github.com/fastapi/fastapi/discussions/12299"
+  },
+  {
+    "question": "Recommended Scaleable Web-sockets Libraries in 2026",
+    "expected_answer": "Since `broadcaster` and `fastapi-socketio` are archived, here are the actively maintained options in 2026:\n\n## Recommended Solutions\n\n### 1. **python-socketio** (Most Popular)\n```bash\npip install python-socketio\n```\n\n```python\nimport socketio\nfrom fastapi import FastAPI\n\nsio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')\napp = FastAPI()\nsocket_app = socketio.ASGIApp(sio, app)\n\n@sio.event\nasync def connect(sid, environ):\n    print(f\"Client connected: {sid}\")\n\n@sio.event\nasync def message(sid, data):\n    await sio.emit('response', {'data': data}, room=sid)\n```\n\nFor horizontal scaling, use Redis adapter:\n```python\nimport socketio\n\nmgr = socketio.AsyncRedisManager('redis://localhost:6379')\nsio = socketio.AsyncServer(client_manager=mgr, async_mode='asgi')\n```\n\n### 2. **Redis Pub/Sub Directly** (Simplest)\n```python\nimport redis.asyncio as redis\nfrom fastapi import WebSocket\n\nredis_client = redis.from_url(\"redis://localhost:6379\")\n\n@app.websocket(\"/ws/{channel}\")\nasync def websocket_endpoint(websocket: WebSocket, channel: str):\n    await websocket.accept()\n    pubsub = redis_client.pubsub()\n    await pubsub.subscribe(channel)\n\n    async for message in pubsub.listen():\n        if message[\"type\"] == \"message\":\n            await websocket.send_text(message[\"data\"].decode())\n```\n\n### 3. **Centrifugo** (Production-Grade)\nStandalone server, connects via HTTP API:\n- Handles millions of connections\n- Built-in Redis/NATS/Kafka support\n- Dashboard included\n\nGitHub: https://github.com/centrifugal/centrifugo\n\n### Comparison\n\n| Solution | Complexity | Scalability | Maintenance |\n|----------|------------|-------------|-------------|\n| python-socketio + Redis | Medium | High | Active |\n| Redis Pub/Sub | Low | High | N/A (Redis) |\n| Centrifugo | High (setup) | Very High | Active |\n\n**My recommendation**: Start with `python-socketio` + Redis adapter. It's the most documented and actively maintained option for FastAPI in 2026.",
+    "url": "https://github.com/fastapi/fastapi/discussions/14807"
+  }
+]

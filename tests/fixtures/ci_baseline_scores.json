@@ -1,0 +1,32 @@
+{
+  "Set cookies when returning a RedirectResponse": {
+    "Faithfulness": 1.0,
+    "Answer Relevancy": 0.6666666666666666,
+    "Contextual Precision": 0.5,
+    "Contextual Recall": 0.5
+  },
+  "How to handle long-running background tasks: FastAPI BackgroundTasks vs Celery?": {
+    "Faithfulness": 1.0,
+    "Answer Relevancy": 1.0,
+    "Contextual Precision": 0.8333333333333333,
+    "Contextual Recall": 0.75
+  },
+  "separate_input_output_schemas=False with computed fields is generating wrong response model in openapi doc for list services": {
+    "Faithfulness": 1.0,
+    "Answer Relevancy": 0.6666666666666666,
+    "Contextual Precision": 1.0,
+    "Contextual Recall": 0.0
+  },
+  "\"Settings example\" in docs with huge performance hit": {
+    "Faithfulness": 1.0,
+    "Answer Relevancy": 1.0,
+    "Contextual Precision": 0,
+    "Contextual Recall": 0.0
+  },
+  "Recommended Scaleable Web-sockets Libraries in 2026": {
+    "Faithfulness": 1.0,
+    "Answer Relevancy": 0.8,
+    "Contextual Precision": 0,
+    "Contextual Recall": 0.0
+  }
+}
