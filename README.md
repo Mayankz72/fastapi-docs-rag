@@ -9,6 +9,18 @@ changes to the pipeline are measured with actual numbers instead of guesswork.
 `gemini-3.5-flash-lite` generation) · DeepEval (metrics/CI) ·
 Arize Phoenix (tracing) · FastAPI (serving)
 
+## Live demo
+
+**https://fastapi-docs-rag.onrender.com** redirects to an interactive Swagger UI —
+expand **POST /query**, click **"Try it out"**, edit the request body, click
+**"Execute"**.
+
+```bash
+curl -X POST https://fastapi-docs-rag.onrender.com/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "How do I add a query parameter with a default value?"}'
+```
+
 ## Setup
 
 ```bash
